@@ -42,7 +42,7 @@ ch.pixel_0 = '${contextPath}/style/images/pixel_0.gif';//0像素的背景，一�
 
 
 
-<#-- 引入easyui扩展 -->
+<#-- 引入easyui扩展  -->
 <script src="${contextPath}/jslib/chExtEasyUI.js" type="text/javascript" charset="utf-8"></script>
 
 <#-- 引入扩展图标 -->
