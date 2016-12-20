@@ -26,6 +26,9 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 
 		SessionInfo sessionInfo = (SessionInfo) request.getSession()
 				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		//request.getSession().setMaxInactiveInterval(30*60);
+		
 		logger.info("进入session拦截器->访问路径为[" + request.getServletPath() + "]");
 		if (sessionInfo == null) {
 			String errMsg = "您还没有登录或登录已超时，请重新登录，然后再刷新本功能！";

@@ -151,8 +151,9 @@
 	</servlet-mapping>
 
 
+	<!-- 设置 服务器session过期时间(分钟) -->
 	<session-config>
-		<session-timeout>15</session-timeout>
+		<session-timeout>525600</session-timeout>
 	</session-config>
 	<error-page>
 		<error-code>404</error-code>
