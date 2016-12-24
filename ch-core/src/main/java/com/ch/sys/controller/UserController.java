@@ -107,7 +107,7 @@ public class UserController extends BaseController<User>{
 			user.setIp(IpUtil.getIpAddr(request));
 			sessionInfo.setUser(user);
 			session.setAttribute(ConfigUtil.getSessionInfoName(), sessionInfo);
-			
+			//session.setMaxInactiveInterval(10);
 		} else {
 			json.setMsg("用户名或密码错误！");
 		}
