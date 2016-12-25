@@ -103,5 +103,15 @@ public class TestController  extends BaseController<User>{
 		
 		JsonUtil.writeJson(json,pw);
 	}
+	
+	
+	@RequestMapping("/userList")
+	public void userList(User data,HttpServletRequest request,HttpServletResponse response,HttpSession session,PrintWriter pw) {
+		
+		
+		List<User> returnList = baseService.find("from User");
+		
+		JsonUtil.writeJson(returnList, pw);
+	}
 
 }
