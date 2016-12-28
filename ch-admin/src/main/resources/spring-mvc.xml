@@ -105,6 +105,7 @@
 
 		<mvc:interceptor>
 			<mvc:mapping path="/test/**" />
+			<mvc:mapping path="/app/**" />
 			<mvc:mapping path="/auth/user/login_doNotNeedSessionAndSecurity" />
 			<bean class="com.ch.base.interceptor.AndroidAppSessionInterceptor" />
 		</mvc:interceptor>

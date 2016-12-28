@@ -38,6 +38,9 @@ public class User implements java.io.Serializable {
 	private String sex;
 	private Integer age;
 	private String photo;
+	private String email;
+	private String phoneNo;
+	private String city;
 	private Set<Role> roles = new HashSet<Role>(0);
 
 	@Id
@@ -139,6 +142,36 @@ public class User implements java.io.Serializable {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+	
+	
+	
+	@Column(name = "EMAIL", length = 200)
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	@Column(name = "PHONENO", length = 200)
+	public String getPhoneNo() {
+		return phoneNo;
+	}
+
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
+	
+	
+	@Column(name = "CITY", length = 200)
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	@Transient
