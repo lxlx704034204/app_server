@@ -73,7 +73,9 @@ public class AppBaseController extends BaseController<User>{
 		}
 		json.setMsg("注册失败！");
 		json.setSuccess(false);
+		response.setContentType("application/json;charset=utf-8");
 		JsonUtil.writeJson(json,pw);
+		
 	}
 	
 	

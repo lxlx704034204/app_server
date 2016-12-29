@@ -36,7 +36,7 @@ public class AndroidAppSessionInterceptor extends HandlerInterceptorAdapter {
 		cookie.setPath(cookiesPath);  // "/" web服务路径,不写说明对整个域名生效 
 		cookie.setMaxAge(cookiesMaxAge);  //"Integer.MAX_VALUE"最大值 
 		response.addCookie(cookie);
-		response.setContentType("application/json;charset=utf-8");
+		
 		
 		//设置浏览器无视跨域
 		//浏览器是否提交cookies
