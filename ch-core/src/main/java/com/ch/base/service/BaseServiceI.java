@@ -231,6 +231,16 @@ public interface BaseServiceI<T> {
 	 * @return 结果集
 	 */
 	public List findBySql(String sql);
+	
+	
+	/**
+	 * 获得结果集
+	 * 
+	 * @param sql
+	 *            HQL语句
+	 * @return 结果集
+	 */
+	public List findByHql(String hql);
 
 	/**
 	 * 获得结果集

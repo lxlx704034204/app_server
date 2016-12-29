@@ -4,6 +4,8 @@
 package com.ch.sys.controller;
 
 import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,7 @@ import com.ch.base.model.easyui.Json;
 import com.ch.base.util.HqlFilter;
 import com.ch.base.util.JsonUtil;
 import com.ch.base.util.MD5Util;
+import com.ch.sys.model.Role;
 import com.ch.sys.model.User;
 import com.ch.sys.service.UserServiceI;
 
@@ -54,6 +57,11 @@ public class AppBaseController extends BaseController<User>{
 				json.setMsg("注册用户失败，用户名已存在！");
 				json.setSuccess(false);
 			} else {
+				
+				String sql = "from Role where name='app普通注册用户'";
+				List<Role>roleList = service.findByHql(sql);
+				//Role role = roleList.get(0);
+				data.setRoles(new HashSet(roleList));
 				
 				String pwd = data.getPwd();
 				data.setPwd(MD5Util.md5(pwd));

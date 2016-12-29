@@ -187,4 +187,10 @@ public class BaseServiceImpl<T> implements BaseServiceI<T> {
 		return baseDao.countBySql(sql, params);
 	}
 
+	@Override
+	public List findByHql(String hql) {
+		// TODO Auto-generated method stub
+		return baseDao.find(hql);
+	}
+
 }
