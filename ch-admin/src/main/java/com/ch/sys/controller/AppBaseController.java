@@ -12,14 +12,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.Hibernate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ch.base.controller.BaseController;
+import com.ch.base.model.SessionInfo;
 import com.ch.base.model.easyui.Json;
+import com.ch.base.util.ConfigUtil;
 import com.ch.base.util.HqlFilter;
+import com.ch.base.util.IpUtil;
 import com.ch.base.util.JsonUtil;
 import com.ch.base.util.MD5Util;
 import com.ch.sys.model.Role;
@@ -45,11 +49,10 @@ public class AppBaseController extends BaseController<User>{
 	/**
 	 * 注册一个用户
 	 */
-	@Override
 	@RequestMapping(value="/regist_doNotNeedSessionAndSecurity", method=RequestMethod.POST)
-	synchronized public void save(User data, HttpServletRequest request,HttpServletResponse response, HttpSession session,PrintWriter pw) {
+	synchronized public void regist(User data, HttpServletRequest request,HttpServletResponse response, HttpSession session,PrintWriter pw) {
 		Json json = new Json();
-		if (data != null && data.getLoginname()!=null && !"".equals(data.getLoginname())) {
+		if (data != null && !"".equals(data.getLoginname())) {
 			HqlFilter hqlFilter = new HqlFilter();
 			hqlFilter.addFilter("QUERY_t#loginname_S_EQ", data.getLoginname());
 			User user = service.getByFilter(hqlFilter);
@@ -79,6 +82,46 @@ public class AppBaseController extends BaseController<User>{
 	}
 	
 	
+	
+	@RequestMapping(value="/login_doNotNeedSessionAndSecurity", method=RequestMethod.POST)
+	synchronized public void login(User data, HttpServletRequest request,HttpServletResponse response, HttpSession session,PrintWriter pw) {
+		Json json = new Json();
+		if (data != null && !"".equals(data.getLoginname()) && !"".equals(data.getPwd())) {
+			HqlFilter hqlFilter = new HqlFilter();
+			hqlFilter.addFilter("QUERY_t#loginname_S_EQ", data.getLoginname());
+			User user = service.getByFilter(hqlFilter);
+			if (user != null) {
+				if(MD5Util.md5(data.getPwd()).equals(user.getPwd())){
+					json.setMsg("登录成功！");
+					json.setSuccess(true);
+					
+					SessionInfo sessionInfo = new SessionInfo();
+					Hibernate.initialize(user.getRoles());
+					
+					for (Role role : user.getRoles()) {
+						Hibernate.initialize(role.getResources());
+					}
+
+					user.setIp(IpUtil.getIpAddr(request));
+					sessionInfo.setUser(user);
+					session.setAttribute(ConfigUtil.getSessionInfoName(), sessionInfo);
+					
+				}else{
+					json.setMsg("密码不正确！");
+					json.setSuccess(false);
+				}
+				
+			} else {
+				
+				
+				json.setMsg("用户名不存在！");
+				json.setSuccess(false);
+			}
+		}
+		//response.setContentType("application/json;charset=utf-8");
+		JsonUtil.writeJson(json,pw);
+		
+	}
 	
 	
 	
