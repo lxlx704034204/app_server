@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.ch.app.model.Team;
 import com.ch.base.controller.BaseController;
 import com.ch.base.model.SessionInfo;
 import com.ch.base.model.easyui.Json;
@@ -145,7 +146,7 @@ public class AppBaseController extends BaseController<User>{
 	public void teamList(User data,HttpServletRequest request,HttpServletResponse response,HttpSession session,PrintWriter pw) {
 		
 		
-		List<User> returnList = service.find("from Team");
+		List<Team> returnList = service.findByHql("from Team");
 		
 		JsonUtil.writeJson(returnList, pw);
 	}
