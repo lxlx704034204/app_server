@@ -103,16 +103,6 @@
 
 		</mvc:interceptor>
 
-		<mvc:interceptor>
-			<mvc:mapping path="/test/**" />
-			<mvc:mapping path="/app/**" />
-			<mvc:mapping path="/auth/user/login_doNotNeedSessionAndSecurity" />
-			<bean class="com.ch.base.interceptor.AndroidAppSessionInterceptor" />
-		</mvc:interceptor>
-		<!-- <bean name="androidAppSessionInterceptor" class="com.ch.base.interceptor.AndroidAppSessionInterceptor"> -->
-		<!-- </bean> -->
-
-
 
 		<mvc:interceptor>
 			<mvc:mapping path="/**" />
@@ -128,8 +118,26 @@
 			<mvc:exclude-mapping path="/**/*_doNotNeedSessionAndSecurity" />
 			<bean class="com.ch.base.interceptor.SecurityInterceptor" />
 		</mvc:interceptor>
+		
+		
+		
+		<!-- app相关请求,统一处理 -->
+		<mvc:interceptor>
+			<mvc:mapping path="/test/**" />
+			<mvc:mapping path="/app/**" />
+			<bean class="com.ch.base.interceptor.AndroidAppSessionInterceptor" />
+		</mvc:interceptor>
+		
+		
 
 	</mvc:interceptors>
+	
+	
+	
+	
+	
+	
+	
 
 	<bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

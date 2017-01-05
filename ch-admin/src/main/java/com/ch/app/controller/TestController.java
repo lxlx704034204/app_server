@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.ch.sys.controller;
+package com.ch.app.controller;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -110,6 +110,15 @@ public class TestController  extends BaseController<User>{
 		
 		
 		List<User> returnList = baseService.find("from User");
+		
+		JsonUtil.writeJson(returnList, pw);
+	}
+	
+	@RequestMapping("/teamList")
+	public void teamList(User data,HttpServletRequest request,HttpServletResponse response,HttpSession session,PrintWriter pw) {
+		
+		
+		List<User> returnList = baseService.find("from Team");
 		
 		JsonUtil.writeJson(returnList, pw);
 	}

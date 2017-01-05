@@ -1,5 +1,6 @@
 package com.ch.base.interceptor;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,14 +38,23 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
 
 		
 		if(sessionInfo!=null && sessionInfo.getUser()!=null){
-			Set<Role> roles = sessionInfo.getUser().getRoles();
-			for (Role role : roles) {
-				for (Resource resource : role.getResources()) {
-					if (resource != null && StringUtils.equals(resource.getUrl(), servletPath)) {
-						return true;
+			
+			
+			Map<String,Boolean> resourceMap = sessionInfo.getUser().getResourceMap();
+			if(resourceMap!=null && resourceMap.get(servletPath)!=null && resourceMap.get(servletPath)){
+				return true;
+			}else{
+				
+				Set<Role> roles = sessionInfo.getUser().getRoles();
+				for (Role role : roles) {
+					for (Resource resource : role.getResources()) {
+						if (resource != null && StringUtils.equals(resource.getUrl(), servletPath)) {
+							return true;
+						}
 					}
 				}
 			}
+			
 		}else{
 			String errMsg = "请登录后获取相应权限,功能路径为[" + servletPath + "]";
 			logger.info(errMsg);

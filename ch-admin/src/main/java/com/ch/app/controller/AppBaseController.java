@@ -1,11 +1,13 @@
 /**
  * 
  */
-package com.ch.sys.controller;
+package com.ch.app.controller;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -74,9 +76,8 @@ public class AppBaseController extends BaseController<User>{
 				json.setSuccess(true);
 			}
 		}
-		json.setMsg("注册失败！");
-		json.setSuccess(false);
-		response.setContentType("application/json;charset=utf-8");
+
+		//response.setContentType("application/json;charset=utf-8");
 		JsonUtil.writeJson(json,pw);
 		
 	}
@@ -92,19 +93,33 @@ public class AppBaseController extends BaseController<User>{
 			User user = service.getByFilter(hqlFilter);
 			if (user != null) {
 				if(MD5Util.md5(data.getPwd()).equals(user.getPwd())){
-					json.setMsg("登录成功！");
-					json.setSuccess(true);
+					
 					
 					SessionInfo sessionInfo = new SessionInfo();
 					Hibernate.initialize(user.getRoles());
 					
+					Map<String,Boolean> resourceMap = new HashMap();
 					for (Role role : user.getRoles()) {
 						Hibernate.initialize(role.getResources());
+						
+						for (com.ch.sys.model.Resource resource : role.getResources()) {
+							resourceMap.put(resource.getUrl(), true);
+						}
 					}
-
-					user.setIp(IpUtil.getIpAddr(request));
-					sessionInfo.setUser(user);
-					session.setAttribute(ConfigUtil.getSessionInfoName(), sessionInfo);
+					
+					if(resourceMap.get("/app/base/login")){
+						json.setMsg("登录成功！");
+						json.setSuccess(true);
+						user.setResourceMap(resourceMap);
+						user.setIp(IpUtil.getIpAddr(request));
+						sessionInfo.setUser(user);
+						session.setAttribute(ConfigUtil.getSessionInfoName(), sessionInfo);
+						
+					}else{
+						json.setMsg("当前帐号没有登录权限！");
+						json.setSuccess(false);
+					}
+					
 					
 				}else{
 					json.setMsg("密码不正确！");
@@ -126,7 +141,14 @@ public class AppBaseController extends BaseController<User>{
 	
 	
 	
-	
+	@RequestMapping("/teamList")
+	public void teamList(User data,HttpServletRequest request,HttpServletResponse response,HttpSession session,PrintWriter pw) {
+		
+		
+		List<User> returnList = service.find("from Team");
+		
+		JsonUtil.writeJson(returnList, pw);
+	}
 	
 	
 	

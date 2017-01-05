@@ -2,6 +2,7 @@ package com.ch.sys.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,6 +43,8 @@ public class User implements java.io.Serializable {
 	private String phoneNo;
 	private String city;
 	private Set<Role> roles = new HashSet<Role>(0);
+	
+	private Map resourceMap;
 
 	@Id
 	@Column(name = "ID", unique = true, nullable = false, length = 36)
@@ -181,6 +184,15 @@ public class User implements java.io.Serializable {
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	@Transient
+	public Map getResourceMap() {
+		return resourceMap;
+	}
+
+	public void setResourceMap(Map resourceMap) {
+		this.resourceMap = resourceMap;
 	}
 
 }
