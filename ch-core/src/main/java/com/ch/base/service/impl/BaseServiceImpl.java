@@ -189,8 +189,23 @@ public class BaseServiceImpl<T> implements BaseServiceI<T> {
 
 	@Override
 	public List findByHql(String hql) {
-		// TODO Auto-generated method stub
 		return baseDao.find(hql);
+	}
+
+	@Override
+	public List findByHql(String hql, int page, int rows) {
+		return baseDao.find(hql, page, rows);
+	}
+
+	@Override
+	public List findByHql(String hql, Map<String, Object> params) {
+		return baseDao.find(hql, params);
+	}
+
+	@Override
+	public List findByHql(String hql, Map<String, Object> params, int page,
+			int rows) {
+		return baseDao.find(hql, params, page, rows);
 	}
 
 }
