@@ -2,6 +2,8 @@ package com.ch.sys.service;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import com.ch.base.service.BaseServiceI;
 import com.ch.sys.model.User;
 
@@ -11,7 +13,9 @@ import com.ch.sys.model.User;
  * 
  */
 public interface UserServiceI extends BaseServiceI<User> {
-
+	
+	
+	
 	/**
 	 * 修改用户角色
 	 * 

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -110,10 +111,20 @@ public class AppBaseController extends BaseController<User> {
 					}
 
 					if (resourceMap.get("/app/base/login")) {
+						
+						//关闭当前hibernate session
+						Session hbnSession = service.getCurrentSession();
+						hbnSession.close();
+						
 						json.setMsg("登录成功！");
 						json.setSuccess(true);
+						json.setObj(user);
+						
+						user.setPwd("");
 						user.setResourceMap(resourceMap);
 						user.setIp(IpUtil.getIpAddr(request));
+						
+						
 						sessionInfo.setUser(user);
 						session.setAttribute(ConfigUtil.getSessionInfoName(),
 								sessionInfo);
