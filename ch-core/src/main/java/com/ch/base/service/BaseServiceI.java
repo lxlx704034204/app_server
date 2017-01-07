@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Session;
+
 import com.ch.base.util.HqlFilter;
 
 /**
@@ -14,6 +16,7 @@ import com.ch.base.util.HqlFilter;
  */
 public interface BaseServiceI<T> {
 
+	public Session getCurrentSession();
 	/**
 	 * 保存一个对象
 	 * 

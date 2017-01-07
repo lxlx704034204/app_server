@@ -42,6 +42,7 @@ public class User implements java.io.Serializable {
 	private String email;
 	private String phoneNo;
 	private String city;
+	private String province;
 	private Set<Role> roles = new HashSet<Role>(0);
 	
 	private Map resourceMap;
@@ -175,6 +176,15 @@ public class User implements java.io.Serializable {
 
 	public void setCity(String city) {
 		this.city = city;
+	}
+	
+	@Column(name = "PROVINCE", length = 200)
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
 	}
 
 	@Transient

@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,12 @@ import com.ch.base.util.HqlFilter;
 @Service
 public class BaseServiceImpl<T> implements BaseServiceI<T> {
 
+	@Override
+	public Session getCurrentSession() {
+		
+		return baseDao.getCurrentSession();
+	}
+	
 	@Autowired
 	private BaseDaoI<T> baseDao;
 

@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Session;
+
 /**
  * 基础数据库操作类
  * 
@@ -16,6 +18,7 @@ import java.util.Map;
  */
 public interface BaseDaoI<T> {
 
+	public Session getCurrentSession();
 	/**
 	 * 保存一个对象
 	 * 

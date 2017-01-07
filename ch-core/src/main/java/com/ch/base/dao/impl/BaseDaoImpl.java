@@ -28,6 +28,7 @@ public class BaseDaoImpl<T> implements BaseDaoI<T> {
 	 * 
 	 * @return org.hibernate.Session
 	 */
+	@Override
 	public Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
 	}
