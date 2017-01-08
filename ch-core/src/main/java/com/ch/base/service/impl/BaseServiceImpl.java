@@ -215,4 +215,9 @@ public class BaseServiceImpl<T> implements BaseServiceI<T> {
 		return baseDao.find(hql, params, page, rows);
 	}
 
+	@Override
+	public Serializable saveObj(Object o) {
+		return baseDao.saveObj(o);
+	}
+
 }

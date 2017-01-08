@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ch.app.model.Team;
+import com.ch.app.model.TeamMate;
 import com.ch.base.controller.BaseController;
 import com.ch.base.model.SessionInfo;
 import com.ch.base.model.easyui.Json;
@@ -153,8 +154,15 @@ public class AppBaseController extends BaseController<User> {
 	@RequestMapping("/teamList")
 	public void teamList(User data, HttpServletRequest request,
 			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
 
-		List<Team> returnList = service.findByHql("from Team");
+		User currentUser = sessionInfo.getUser();
+		
+		Map<String, Object> params = new HashMap();
+		params.put("userId", currentUser.getId());
+		List<Team> returnList = service.findByHql("from Team t where "
+				+ "t.id in(select m.team.id from TeamMate m where m.user.id=:userId)",params);
 
 		JsonUtil.writeJson(returnList, pw);
 	}
@@ -162,7 +170,7 @@ public class AppBaseController extends BaseController<User> {
 	@RequestMapping("/searchTeamForJoin")
 	public void searchTeamForJoin(Team data, HttpServletRequest request,
 			HttpServletResponse response, HttpSession session, PrintWriter pw) {
-
+		
 		SessionInfo sessionInfo = (SessionInfo) request.getSession()
 				.getAttribute(ConfigUtil.getSessionInfoName());
 
@@ -182,6 +190,53 @@ public class AppBaseController extends BaseController<User> {
 						params);
 
 		JsonUtil.writeJson(returnList, pw);
+	}
+	
+	
+	@RequestMapping("/joinTeam")
+	public void joinTeam( HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		//Map paramMap = request.getParameterMap();
+		String teamId = request.getParameter("teamId");
+		
+		User currentUser = sessionInfo.getUser();
+
+		Json json = new Json();
+		
+		Map<String, Object> params = new HashMap();
+		params.put("id", teamId);
+
+		
+		List<Team> returnList = service
+				.findByHql("from Team t where t.id=:id",params);
+		if(returnList.size()>0){
+			Team team = returnList.get(0);
+			TeamMate teamMate = new TeamMate();
+			teamMate.setTeam(team);
+			teamMate.setName(currentUser.getName());
+			teamMate.setUser(currentUser);
+			try {
+				service.saveObj(teamMate);
+			} catch (Exception e) {
+				e.printStackTrace();
+				json.setMsg(e.toString());
+				json.setSuccess(false);
+			}
+			json.setMsg("加入成功!");
+			json.setSuccess(true);
+			
+		}else{
+			json.setMsg("获取队伍失败！");
+			json.setSuccess(false);
+		}
+		
+		
+
+		JsonUtil.writeJson(json, pw);
 	}
 
 }
