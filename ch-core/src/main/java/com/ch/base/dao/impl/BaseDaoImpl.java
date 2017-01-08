@@ -235,6 +235,14 @@ public class BaseDaoImpl<T> implements BaseDaoI<T> {
 		}
 		return (BigInteger) q.uniqueResult();
 	}
+
+	@Override
+	public Serializable saveObj(Object o) {
+		if (o != null) {
+			return getCurrentSession().save(o);
+		}
+		return null;
+	}
 	
 	
 

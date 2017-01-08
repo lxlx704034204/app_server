@@ -32,8 +32,8 @@ public class TeamMate implements Serializable {
 	private String name;
 	private Team team;
 	private User user;
-	private boolean isTeamLeader;
-	private boolean isTeamManager;
+	private Boolean isTeamLeader;
+	private Boolean isTeamManager;
 	private Integer totalGoal;
 	private Integer totalAssist;
 	private Integer totalMvp;
@@ -110,21 +110,21 @@ public class TeamMate implements Serializable {
 
 	@Column(name = "IS_TEAM_LEADER", precision = 2, scale = 0)
 	@org.hibernate.annotations.Type(type="byte")
-	public boolean isTeamLeader() {
+	public Boolean getIsTeamLeader() {
 		return isTeamLeader;
 	}
 
-	public void setTeamLeader(boolean isTeamLeader) {
+	public void setIsTeamLeader(Boolean isTeamLeader) {
 		this.isTeamLeader = isTeamLeader;
 	}
 
 	@Column(name = "IS_TEAM_MAGAGER", precision = 2, scale = 0)
 	@org.hibernate.annotations.Type(type="byte")
-	public boolean isTeamManager() {
+	public Boolean getIsTeamManager() {
 		return isTeamManager;
 	}
 
-	public void setTeamManager(boolean isTeamManager) {
+	public void setIsTeamManager(Boolean isTeamManager) {
 		this.isTeamManager = isTeamManager;
 	}
 
