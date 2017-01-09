@@ -113,9 +113,10 @@ public class AppBaseController extends BaseController<User> {
 
 					if (resourceMap.get("/app/base/login")) {
 						
-						//关闭当前hibernate session
+						//当前hibernate session
 						Session hbnSession = service.getCurrentSession();
-						hbnSession.close();
+						//把user对象从session缓存中清除,这样close后就不会更新到数据库
+						hbnSession.evict(user);
 						
 						json.setMsg("登录成功！");
 						json.setSuccess(true);
@@ -185,9 +186,13 @@ public class AppBaseController extends BaseController<User> {
 		
 		List<Team> returnList = service
 				.findByHql(
-						"from Team t where t.city like :city and t.name like :name "
-						+ "and t.id not in(select m.team.id from TeamMate m where m.user.id=:userId)",
+						"from Team t where t.city like :city and t.name like :name"
+						+ " and t.id not in(select m.team.id from TeamMate m where m.user.id=:userId)"
+						+ " order by t.updatedatetime desc",
 						params);
+		for(Team team:returnList){
+			team.setIsJoin(false);
+		}
 
 		JsonUtil.writeJson(returnList, pw);
 	}
@@ -202,6 +207,11 @@ public class AppBaseController extends BaseController<User> {
 		
 		//Map paramMap = request.getParameterMap();
 		String teamId = request.getParameter("teamId");
+		String age = request.getParameter("age");
+		String height = request.getParameter("height");
+		String weight = request.getParameter("weight");
+		String position = request.getParameter("position");
+		String name = request.getParameter("name");
 		
 		User currentUser = sessionInfo.getUser();
 
@@ -214,12 +224,17 @@ public class AppBaseController extends BaseController<User> {
 		List<Team> returnList = service
 				.findByHql("from Team t where t.id=:id",params);
 		if(returnList.size()>0){
-			Team team = returnList.get(0);
-			TeamMate teamMate = new TeamMate();
-			teamMate.setTeam(team);
-			teamMate.setName(currentUser.getName());
-			teamMate.setUser(currentUser);
 			try {
+				Team team = returnList.get(0);
+				TeamMate teamMate = new TeamMate();
+				teamMate.setTeam(team);
+				teamMate.setName(name);
+				teamMate.setAge(Integer.valueOf(age));
+				teamMate.setWeight(Integer.valueOf(weight));
+				teamMate.setHeight(Integer.valueOf(height));
+				teamMate.setPosition(position);
+				teamMate.setUser(currentUser);
+			
 				service.saveObj(teamMate);
 			} catch (Exception e) {
 				e.printStackTrace();

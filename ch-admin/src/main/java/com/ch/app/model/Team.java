@@ -17,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
@@ -39,6 +40,7 @@ public class Team implements Serializable {
 	private String logoPic;
 	private String description;
 	private String city;
+	private Boolean isJoin;
 	
 	private Set<TeamMate> teamMates = new HashSet<TeamMate>(0);
 
@@ -122,6 +124,15 @@ public class Team implements Serializable {
 
 	public void setTeamMates(Set<TeamMate> teamMates) {
 		this.teamMates = teamMates;
+	}
+
+	@Transient
+	public Boolean getIsJoin() {
+		return isJoin;
+	}
+
+	public void setIsJoin(Boolean isJoin) {
+		this.isJoin = isJoin;
 	}
 	
 	
