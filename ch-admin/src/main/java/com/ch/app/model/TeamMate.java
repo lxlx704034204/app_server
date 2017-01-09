@@ -40,6 +40,7 @@ public class TeamMate implements Serializable {
 	private Integer age;
 	private Integer height;
 	private Integer weight;
+	private String position;
 	
 
 	@Id
@@ -180,6 +181,14 @@ public class TeamMate implements Serializable {
 
 	public void setWeight(Integer weight) {
 		this.weight = weight;
+	}
+	@Column(name = "POSITION", nullable = false, length = 200)
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
 	}
 	
 }
