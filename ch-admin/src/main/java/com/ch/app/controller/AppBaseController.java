@@ -162,10 +162,12 @@ public class AppBaseController extends BaseController<User> {
 		
 		Map<String, Object> params = new HashMap();
 		params.put("userId", currentUser.getId());
-		List<Team> returnList = service.findByHql("from Team t where "
-				+ "t.id in(select m.team.id from TeamMate m where m.user.id=:userId)",params);
+		List returnList = service.findByHql("select new Map(m.team.name as name,m.team.id as id,"
+				+ " m.team.city as city,m.team.logoPic as logoPic,m.team.description as description,"
+				+ " m.name as myName,m.isTeamManager as isTeamManager)"
+				+ " from TeamMate m where m.user.id=:userId order by m.createdatetime desc",params);
 
-		JsonUtil.writeJson(returnList, pw);
+		JsonUtil.writeJson(returnList, pw); 
 	}
 
 	@RequestMapping("/searchTeamForJoin")

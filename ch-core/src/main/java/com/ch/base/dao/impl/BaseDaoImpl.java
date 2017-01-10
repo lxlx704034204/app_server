@@ -189,6 +189,8 @@ public class BaseDaoImpl<T> implements BaseDaoI<T> {
 			}
 		}
 		return q.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+		
+		
 	}
 
 	@Override
