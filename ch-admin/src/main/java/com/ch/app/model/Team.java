@@ -126,7 +126,8 @@ public class Team implements Serializable {
 		this.teamMates = teamMates;
 	}
 
-	@Transient
+	@Column(name = "IS_JOIN")
+	@org.hibernate.annotations.Type(type="yes_no")
 	public Boolean getIsJoin() {
 		return isJoin;
 	}

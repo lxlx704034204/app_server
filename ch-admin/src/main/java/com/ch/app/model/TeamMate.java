@@ -34,6 +34,7 @@ public class TeamMate implements Serializable {
 	private User user;
 	private Boolean isTeamLeader;
 	private Boolean isTeamManager;
+	private Boolean isCurrentTeam;
 	private Integer totalGoal;
 	private Integer totalAssist;
 	private Integer totalMvp;
@@ -109,8 +110,8 @@ public class TeamMate implements Serializable {
 		this.user = user;
 	}
 
-	@Column(name = "IS_TEAM_LEADER", precision = 2, scale = 0)
-	@org.hibernate.annotations.Type(type="byte")
+	@Column(name = "IS_TEAM_LEADER")
+	@org.hibernate.annotations.Type(type="yes_no")
 	public Boolean getIsTeamLeader() {
 		return isTeamLeader;
 	}
@@ -119,8 +120,8 @@ public class TeamMate implements Serializable {
 		this.isTeamLeader = isTeamLeader;
 	}
 
-	@Column(name = "IS_TEAM_MAGAGER", precision = 2, scale = 0)
-	@org.hibernate.annotations.Type(type="byte")
+	@Column(name = "IS_TEAM_MAGAGER")
+	@org.hibernate.annotations.Type(type="yes_no")
 	public Boolean getIsTeamManager() {
 		return isTeamManager;
 	}
@@ -182,13 +183,23 @@ public class TeamMate implements Serializable {
 	public void setWeight(Integer weight) {
 		this.weight = weight;
 	}
-	@Column(name = "POSITION", nullable = false, length = 200)
+	@Column(name = "POSITION",  length = 200)
 	public String getPosition() {
 		return position;
 	}
 
 	public void setPosition(String position) {
 		this.position = position;
+	}
+	
+	@Column(name = "IS_CURRENT_TEAM")
+	@org.hibernate.annotations.Type(type="yes_no")
+	public Boolean getIsCurrentTeam() {
+		return isCurrentTeam;
+	}
+
+	public void setIsCurrentTeam(Boolean isCurrentTeam) {
+		this.isCurrentTeam = isCurrentTeam;
 	}
 	
 }
