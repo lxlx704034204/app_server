@@ -4,6 +4,7 @@
 package com.ch.app.controller;
 
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.ch.app.model.Team;
+import com.ch.app.model.TeamMatch;
 import com.ch.app.model.TeamMate;
+import com.ch.app.model.app.AppUser;
 import com.ch.base.controller.BaseController;
 import com.ch.base.model.SessionInfo;
 import com.ch.base.model.easyui.Json;
@@ -95,6 +98,8 @@ public class AppBaseController extends BaseController<User> {
 			HqlFilter hqlFilter = new HqlFilter();
 			hqlFilter.addFilter("QUERY_t#loginname_S_EQ", data.getLoginname());
 			User user = service.getByFilter(hqlFilter);
+			
+			
 			if (user != null) {
 				if (MD5Util.md5(data.getPwd()).equals(user.getPwd())) {
 
@@ -118,9 +123,15 @@ public class AppBaseController extends BaseController<User> {
 						//把user对象从session缓存中清除,这样close后就不会更新到数据库
 						hbnSession.evict(user);
 						
+						AppUser appUser = new AppUser(user);
+						
+						Team currentTeam = getCurrentTeamByUserId(user.getId());
+						appUser.setCurrentTeam(currentTeam);
+						
+						
 						json.setMsg("登录成功！");
 						json.setSuccess(true);
-						json.setObj(user);
+						json.setObj(appUser);
 						
 						user.setPwd("");
 						user.setResourceMap(resourceMap);
@@ -153,22 +164,41 @@ public class AppBaseController extends BaseController<User> {
 	}
 
 	@RequestMapping("/teamList")
-	public void teamList(User data, HttpServletRequest request,
+	public void teamList(HttpServletRequest request,
 			HttpServletResponse response, HttpSession session, PrintWriter pw) {
 		SessionInfo sessionInfo = (SessionInfo) request.getSession()
 				.getAttribute(ConfigUtil.getSessionInfoName());
 
 		User currentUser = sessionInfo.getUser();
 		
-		Map<String, Object> params = new HashMap();
-		params.put("userId", currentUser.getId());
-		List returnList = service.findByHql("select new Map(m.team.name as name,m.team.id as id,"
-				+ " m.team.city as city,m.team.logoPic as logoPic,m.team.description as description,"
-				+ " m.name as myName,m.isTeamManager as isTeamManager)"
-				+ " from TeamMate m where m.user.id=:userId order by m.createdatetime desc",params);
-
-		JsonUtil.writeJson(returnList, pw); 
+		String getType = request.getParameter("getType");
+		
+		
+		if("my".equals(getType)){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", currentUser.getId());
+			List returnList = service.findByHql("select new Map(m.team.name as name,m.team.id as id,"
+					+ " m.team.city as city,m.team.logoPic as logoPic,m.team.description as description,"
+					+ " m.name as myName,m.isTeamManager as isTeamManager,m.isCurrentTeam as isCurrentTeam)"
+					+ " from TeamMate m where m.user.id=:userId order by m.createdatetime desc",params);
+			JsonUtil.writeJson(returnList, pw); 
+		}else if("other".equals(getType)){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", currentUser.getId());
+			List returnList = service.findByHql("from Team t where t.id not in "
+					+ "(select m.team.id from TeamMate m where m.user.id=:userId)",params);
+			JsonUtil.writeJson(returnList, pw); 
+		}
+		
+		
 	}
+	
+	
+	
+	
+	
 
 	@RequestMapping("/searchTeamForJoin")
 	public void searchTeamForJoin(Team data, HttpServletRequest request,
@@ -254,6 +284,118 @@ public class AppBaseController extends BaseController<User> {
 		
 
 		JsonUtil.writeJson(json, pw);
+	}
+	
+	
+	@RequestMapping("/createTeam")
+	public void createTeam(Team data, HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		Json json = new Json();
+			
+		try {
+			
+			data.setIsJoin(true);
+			data.setDescription("新球队成立于"+(new Date()).toLocaleString());
+			service.saveObj(data);
+			
+			User currentUser = sessionInfo.getUser();
+			
+			TeamMate teamMate = new TeamMate();
+			teamMate.setTeam(data);
+			teamMate.setName(currentUser.getName());
+			teamMate.setUser(currentUser);
+			teamMate.setIsTeamLeader(true);
+			teamMate.setIsTeamManager(true);
+			service.saveObj(teamMate);
+			
+			json.setMsg("创建成功!");
+			json.setSuccess(true);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setMsg(e.toString());
+			json.setSuccess(false);
+		}
+			
+		
+
+		JsonUtil.writeJson(json, pw);
+	}
+	
+	
+	
+	@RequestMapping("/createMatch")
+	public void createMatch(TeamMatch data, HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		Json json = new Json();
+			
+		try {
+			String homeTeamId = request.getParameter("homeTeamId");
+			String hostTeamId = request.getParameter("hostTeamId");
+			
+			Team homeTeam = getTeamById(homeTeamId);
+			Team hostTeam = getTeamById(hostTeamId);
+
+			
+			data.setHomeTeam(homeTeam);
+			data.setHostTeam(hostTeam);
+			service.saveObj(data);
+			
+			json.setMsg("发起比赛成功!");
+			json.setSuccess(true);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setMsg(e.toString());
+			json.setSuccess(false);
+		}
+			
+		
+
+		JsonUtil.writeJson(json, pw);
+	}
+
+	private Team getTeamById(String teamId) {
+		
+		Map<String, Object> params = new HashMap();
+		params.put("id", teamId);
+
+		List<Team> returnList = service
+				.findByHql("from Team t where t.id=:id",params);
+		if(returnList.size()>0){
+			return returnList.get(0);
+		}
+		return null;
+	}
+	
+	private Team getCurrentTeamByUserId(String userId) {
+		
+		Map<String, Object> params = new HashMap();
+		params.put("userId", userId);
+
+		List<Team> returnList = service
+				.findByHql("from Team t where t.id in"
+						+ "(select m.team.id from TeamMate m where m.user.id=:userId and m.isCurrentTeam=true)",params);
+		if(returnList.size()>0){
+			return returnList.get(0);
+		}else{
+			returnList = service
+					.findByHql("from Team t where t.id in"
+							+ "(select m.team.id from TeamMate m where m.user.id=:userId "
+							+ "and (m.isTeamManager=true or m.isTeamLeader=true))",params);
+			if(returnList.size()>0){
+				return returnList.get(0);
+			}
+		}
+		return null;
 	}
 
 }
