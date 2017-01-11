@@ -126,7 +126,9 @@ public class AppBaseController extends BaseController<User> {
 						AppUser appUser = new AppUser(user);
 						
 						Team currentTeam = getCurrentTeamByUserId(user.getId());
-						appUser.setCurrentTeam(currentTeam);
+						if(currentTeam!=null){
+							appUser.setCurrentTeam(currentTeam);
+						}
 						
 						
 						json.setMsg("登录成功！");
