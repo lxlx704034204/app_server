@@ -37,15 +37,24 @@ public class AndroidAppSessionInterceptor extends HandlerInterceptorAdapter {
 		cookie.setMaxAge(cookiesMaxAge);  //"Integer.MAX_VALUE"最大值 
 		response.addCookie(cookie);
 		
+		//字符串以;分隔多个允许访问的域名
+		String[] allowOrginArray = allowOrigin.split(";");
 		
 		//设置浏览器无视跨域
 		//浏览器是否提交cookies
 		response.addHeader("Access-Control-Allow-Credentials", "true");
-		//如果需要浏览器请求付带cookies,需要设置具体的网站域名,不能用*号代替,
-		response.addHeader("Access-Control-Allow-Origin", allowOrigin);//测试"http://localhost:8080"
 		
+		String reqOrgin = request.getHeader("Origin");
 		
+		for(String orgin:allowOrginArray){
+			if(reqOrgin.equals(orgin)){
+				//如果需要浏览器请求要付带cookies,需要设置具体允许的网站域名才能接收,不能用*号代替,
+				response.addHeader("Access-Control-Allow-Origin", orgin);//测试"http://localhost:8080"
+				return true;
+			}
+		}
 		
+		response.addHeader("Access-Control-Allow-Origin", allowOrginArray[0]);
 		return true;
 
 	}
