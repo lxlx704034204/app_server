@@ -2,6 +2,8 @@ package com.ch.app.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -9,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -39,6 +43,7 @@ public class TeamMatch implements Serializable{
 	private Integer homeGoal;
 	private Integer hostGoal;
 	private Double fee;
+	private Set<MatchPlayer> matchPlayers = new HashSet<MatchPlayer>(0);
 	
 	
 	public TeamMatch() {
@@ -185,6 +190,16 @@ public class TeamMatch implements Serializable{
 
 	public void setFee(Double fee) {
 		this.fee = fee;
+	}
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "MATCH_TEAM_MATE", schema = "", joinColumns = { @JoinColumn(name = "MATCH_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "PLAYER_ID", nullable = false, updatable = false) })
+	public Set<MatchPlayer> getMatchPlayers() {
+		return matchPlayers;
+	}
+
+	public void setMatchPlayers(Set<MatchPlayer> matchPlayers) {
+		this.matchPlayers = matchPlayers;
 	}
 	
 	

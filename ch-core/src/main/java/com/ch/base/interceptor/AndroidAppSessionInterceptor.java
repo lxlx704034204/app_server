@@ -47,7 +47,7 @@ public class AndroidAppSessionInterceptor extends HandlerInterceptorAdapter {
 		String reqOrgin = request.getHeader("Origin");
 		
 		for(String orgin:allowOrginArray){
-			if(reqOrgin.equals(orgin)){
+			if(reqOrgin.toLowerCase().equals(orgin)){
 				//如果需要浏览器请求要付带cookies,需要设置具体允许的网站域名才能接收,不能用*号代替,
 				response.addHeader("Access-Control-Allow-Origin", orgin);//测试"http://localhost:8080"
 				return true;

@@ -4,6 +4,7 @@
 package com.ch.app.controller;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +54,8 @@ public class AppBaseController extends BaseController<User> {
 
 	@Resource
 	private JdbcTemplate jdbcTemplate;
+	
+	private SimpleDateFormat sdf = new SimpleDateFormat();
 
 	/**
 	 * 注册一个用户
@@ -197,7 +200,47 @@ public class AppBaseController extends BaseController<User> {
 		
 	}
 	
-	
+	@RequestMapping("/matchList")
+	public void matchList(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+
+		User currentUser = sessionInfo.getUser();
+		
+		String getType = request.getParameter("getType");
+		
+		
+		if("myTeam".equals(getType)){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", currentUser.getId());
+			List returnList = service.findByHql("select new Map(m.homeTeam.name as homeTeamName,m.hostTeam.name as hostTeamName,"
+					+ " m.place as place,m.matchTime as matchTime,m.homeTeam.logoPic as homeTeamLogo,m.hostTeam.logoPic as hostTeamLogo)"
+					+ " from TeamMatch m join m.homeTeam.teamMates teamMate"
+					+ " where teamMate.user.id=:userId order by m.createdatetime desc",params);
+
+			JsonUtil.writeJson(returnList, pw); 
+		}else if("my".equals(getType)){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", currentUser.getId());
+			List returnList = service.findByHql("select new Map(m.homeTeam.name as homeTeamName,m.hostTeam.name as hostTeamName,"
+					+ " m.place as place,m.matchTime as matchTime,m.homeTeam.logoPic as homeTeamLogo,m.hostTeam.logoPic as hostTeamLogo)"
+					+ " from TeamMatch m join m.matchPlayers player where player.teamMate.user.id=:userId order by m.createdatetime desc",params);
+
+			JsonUtil.writeJson(returnList, pw); 
+		}else if("other".equals(getType)){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", currentUser.getId());
+			List returnList = service.findByHql("from Team t where t.id not in "
+					+ "(select m.team.id from TeamMate m where m.user.id=:userId)",params);
+			JsonUtil.writeJson(returnList, pw); 
+		}
+		
+		
+	}
 	
 	
 	
@@ -251,39 +294,28 @@ public class AppBaseController extends BaseController<User> {
 
 		Json json = new Json();
 		
-		Map<String, Object> params = new HashMap();
-		params.put("id", teamId);
 
 		
-		List<Team> returnList = service
-				.findByHql("from Team t where t.id=:id",params);
-		if(returnList.size()>0){
-			try {
-				Team team = returnList.get(0);
-				TeamMate teamMate = new TeamMate();
-				teamMate.setTeam(team);
-				teamMate.setName(name);
-				teamMate.setAge(Integer.valueOf(age));
-				teamMate.setWeight(Integer.valueOf(weight));
-				teamMate.setHeight(Integer.valueOf(height));
-				teamMate.setPosition(position);
-				teamMate.setUser(currentUser);
-			
-				service.saveObj(teamMate);
-			} catch (Exception e) {
-				e.printStackTrace();
-				json.setMsg(e.toString());
-				json.setSuccess(false);
-			}
-			json.setMsg("加入成功!");
-			json.setSuccess(true);
-			
-		}else{
-			json.setMsg("获取队伍失败！");
+		try {
+			Team team = getTeamById(teamId);
+			TeamMate teamMate = new TeamMate();
+			teamMate.setTeam(team);
+			teamMate.setName(name);
+			teamMate.setAge(Integer.valueOf(age));
+			teamMate.setWeight(Integer.valueOf(weight));
+			teamMate.setHeight(Integer.valueOf(height));
+			teamMate.setPosition(position);
+			teamMate.setUser(currentUser);
+		
+			service.saveObj(teamMate);
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setMsg(e.toString());
 			json.setSuccess(false);
 		}
-		
-		
+		json.setMsg("加入成功!");
+		json.setSuccess(true);
+			
 
 		JsonUtil.writeJson(json, pw);
 	}
@@ -331,25 +363,45 @@ public class AppBaseController extends BaseController<User> {
 	
 	
 	@RequestMapping("/createMatch")
-	public void createMatch(TeamMatch data, HttpServletRequest request,
+	public void createMatch(HttpServletRequest request,
 			HttpServletResponse response, HttpSession session, PrintWriter pw) {
 		
 		SessionInfo sessionInfo = (SessionInfo) request.getSession()
 				.getAttribute(ConfigUtil.getSessionInfoName());
 		
+		sdf.applyPattern("yyyy-MM-dd HH:mm:ss");
 		Json json = new Json();
-			
+		
 		try {
+			String matchTimeStr = request.getParameter("matchTimeTemp");
+			String endJoinTimeStr = request.getParameter("endJoinTimeTemp");
+			String place = request.getParameter("place");
+			String memberCountStr = request.getParameter("memberCount");
+			String clothColor = request.getParameter("clothColor");
+			String feeStr = request.getParameter("fee");
 			String homeTeamId = request.getParameter("homeTeamId");
 			String hostTeamId = request.getParameter("hostTeamId");
+	
+			Date matchTime = sdf.parse(matchTimeStr);
+			Date endJoinTime = sdf.parse(endJoinTimeStr);
 			
+			TeamMatch match = new TeamMatch();
+			match.setMatchTime(matchTime);
+			match.setEndJoinTime(endJoinTime);
+			match.setPlace(place);
+			match.setMemberCount(Integer.valueOf(memberCountStr));
+			match.setClothColor(clothColor);
+			match.setFee(Double.valueOf(feeStr));
+			
+
 			Team homeTeam = getTeamById(homeTeamId);
 			Team hostTeam = getTeamById(hostTeamId);
 
 			
-			data.setHomeTeam(homeTeam);
-			data.setHostTeam(hostTeam);
-			service.saveObj(data);
+			match.setHomeTeam(homeTeam);
+			match.setHostTeam(hostTeam);
+			service.saveObj(match);
+			
 			
 			json.setMsg("发起比赛成功!");
 			json.setSuccess(true);
@@ -399,5 +451,21 @@ public class AppBaseController extends BaseController<User> {
 		}
 		return null;
 	}
+	
+	
+	@RequestMapping("/testSession")
+	public void testSession( HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		Json json = new Json();
+		json.setMsg("session成功!");
+		json.setSuccess(true);
+
+		JsonUtil.writeJson(json, pw);
+	}
+	
 
 }
