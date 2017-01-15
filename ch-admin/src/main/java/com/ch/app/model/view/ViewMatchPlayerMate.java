@@ -1,9 +1,7 @@
-package com.ch.app.model;
+package com.ch.app.model.view;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -11,10 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,12 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.ch.app.model.Team;
 
 @Entity
-@Table(name = "TEAM_MATCH", schema = "")
+@Table(name = "v_match_player_mate_user", schema = "")
 @DynamicInsert(true)
 @DynamicUpdate(true)
-public class TeamMatch implements Serializable{
+public class ViewMatchPlayerMate implements Serializable {
 
 	private String id;
 	private Date createdatetime;
@@ -44,20 +40,26 @@ public class TeamMatch implements Serializable{
 	private Integer homeGoal;
 	private Integer hostGoal;
 	private Double fee;
-	private Set<MatchPlayer> matchPlayers = new HashSet<MatchPlayer>(0);
+	
+	private String mateId;
+	private String mateName;
+	private String mateUserId;
+	
+	private String playerId;
+	private String assist;
+	private String goal;
+	private String mvp;
+	private String alreadyJoinMateId;
+	private String joinType;
 	
 	
-	public TeamMatch() {
-
+	public ViewMatchPlayerMate() {
 	}
-
+	
 	@Id
-	@Column(name = "ID", unique = true, nullable = false, length = 36)
+	@Column(name = "ID", length = 36)
 	public String getId() {
-		if (!StringUtils.isBlank(this.id)) {
-			return this.id;
-		}
-		return UUID.randomUUID().toString();
+		return this.id;
 	}
 
 	public void setId(String id) {
@@ -67,9 +69,7 @@ public class TeamMatch implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "UPDATEDATETIME", length = 7)
 	public Date getUpdatedatetime() {
-		if (this.updatedatetime != null)
-			return this.updatedatetime;
-		return new Date();
+		return this.updatedatetime;
 	}
 
 	public void setUpdatedatetime(Date updatedatetime) {
@@ -79,9 +79,7 @@ public class TeamMatch implements Serializable{
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATEDATETIME", length = 7)
 	public Date getCreatedatetime() {
-		if (this.createdatetime != null)
-			return this.createdatetime;
-		return new Date();
+		return this.updatedatetime;
 	}
 
 	public void setCreatedatetime(Date createdatetime) {
@@ -192,14 +190,71 @@ public class TeamMatch implements Serializable{
 	public void setFee(Double fee) {
 		this.fee = fee;
 	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "teamMatch")
-	public Set<MatchPlayer> getMatchPlayers() {
-		return matchPlayers;
+	
+	
+	@Column(name = "MATE_ID", length = 50)
+	public String getMateId() {
+		return mateId;
+	}
+	public void setMateId(String mateId) {
+		this.mateId = mateId;
+	}
+	@Column(name = "NAME", length = 50)
+	public String getMateName() {
+		return mateName;
+	}
+	public void setMateName(String mateName) {
+		this.mateName = mateName;
+	}
+	@Column(name = "USER_ID", length = 50)
+	public String getMateUserId() {
+		return mateUserId;
+	}
+	public void setMateUserId(String mateUserId) {
+		this.mateUserId = mateUserId;
+	}
+	@Column(name = "PLAYER_ID", length = 50)
+	public String getPlayerId() {
+		return playerId;
+	}
+	public void setPlayerId(String playerId) {
+		this.playerId = playerId;
+	}
+	@Column(name = "ASSIST", length = 50)
+	public String getAssist() {
+		return assist;
+	}
+	public void setAssist(String assist) {
+		this.assist = assist;
+	}
+	@Column(name = "GOAL", length = 50)
+	public String getGoal() {
+		return goal;
+	}
+	public void setGoal(String goal) {
+		this.goal = goal;
+	}
+	@Column(name = "MVP", length = 50)
+	public String getMvp() {
+		return mvp;
+	}
+	public void setMvp(String mvp) {
+		this.mvp = mvp;
+	}
+	@Column(name = "ALREADY_JOIN_MATE", length = 50)
+	public String getAlreadyJoinMateId() {
+		return alreadyJoinMateId;
+	}
+	public void setAlreadyJoinMateId(String alreadyJoinMateId) {
+		this.alreadyJoinMateId = alreadyJoinMateId;
+	}
+	@Column(name = "JOIN_TYPE", length = 50)
+	public String getJoinType() {
+		return joinType;
 	}
 
-	public void setMatchPlayers(Set<MatchPlayer> matchPlayers) {
-		this.matchPlayers = matchPlayers;
+	public void setJoinType(String joinType) {
+		this.joinType = joinType;
 	}
 	
 	

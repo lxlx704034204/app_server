@@ -38,8 +38,12 @@ public class MatchPlayer implements Serializable {
 	private Integer assist;
 	private Integer mvp;
 	private Double fee;
-	private Set<TeamMatch> teamMatchs = new HashSet<TeamMatch>(0);
+	private String joinType;
+	private TeamMatch teamMatch;
 	
+	public MatchPlayer() {
+	}
+
 	@Id
 	@Column(name = "ID", unique = true, nullable = false, length = 36)
 	public String getId() {
@@ -94,15 +98,17 @@ public class MatchPlayer implements Serializable {
 		this.fee = fee;
 	}
 	
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "MATCH_TEAM_MATE", schema = "", joinColumns = { @JoinColumn(name = "PLAYER_ID", nullable = false, updatable = false) }, inverseJoinColumns = { @JoinColumn(name = "MATCH_ID", nullable = false, updatable = false) })
-	public Set<TeamMatch> getTeamMatchs() {
-		return teamMatchs;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "TEAM_MATCH_ID")
+	public TeamMatch getTeamMatch() {
+		return teamMatch;
 	}
-	public void setTeamMatchs(Set<TeamMatch> teamMatchs) {
-		this.teamMatchs = teamMatchs;
+
+	public void setTeamMatch(TeamMatch teamMatch) {
+		this.teamMatch = teamMatch;
 	}
-	
+
 	@Column(name = "GOAL", precision = 8, scale = 0)
 	public Integer getGoal() {
 		return goal;
@@ -128,6 +134,15 @@ public class MatchPlayer implements Serializable {
 
 	public void setMvp(Integer mvp) {
 		this.mvp = mvp;
+	}
+	
+	@Column(name = "JOIN_TYPE", length = 50)
+	public String getJoinType() {
+		return joinType;
+	}
+
+	public void setJoinType(String joinType) {
+		this.joinType = joinType;
 	}
 	
 	

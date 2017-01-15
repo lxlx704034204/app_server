@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.ch.app.model.MatchPlayer;
 import com.ch.app.model.Team;
 import com.ch.app.model.TeamMatch;
 import com.ch.app.model.TeamMate;
@@ -131,6 +132,8 @@ public class AppBaseController extends BaseController<User> {
 						Team currentTeam = getCurrentTeamByUserId(user.getId());
 						if(currentTeam!=null){
 							appUser.setCurrentTeam(currentTeam);
+						}else{
+							currentTeam = setCurrentTeamByUserId(user.getId());
 						}
 						
 						
@@ -181,6 +184,8 @@ public class AppBaseController extends BaseController<User> {
 		
 		if("my".equals(getType)){
 			
+			setCurrentTeamByUserId(currentUser.getId());
+			
 			Map<String, Object> params = new HashMap();
 			params.put("userId", currentUser.getId());
 			List returnList = service.findByHql("select new Map(m.team.name as name,m.team.id as id,"
@@ -212,15 +217,27 @@ public class AppBaseController extends BaseController<User> {
 		
 		
 		if("myTeam".equals(getType)){
+//			
+//			Map<String, Object> params = new HashMap();
+//			params.put("userId", currentUser.getId());
+//			List returnList = service.findByHql("select new Map(m.id as matchId,m.homeTeam.name as homeTeamName,m.hostTeam.name as hostTeamName,"
+//					+ " m.place as place,m.matchTime as matchTime,m.homeTeam.logoPic as homeTeamLogo,m.hostTeam.logoPic as hostTeamLogo)"
+//					+ " from TeamMatch m join m.homeTeam.teamMates teamMate"
+//					+ " where teamMate.user.id=:userId order by m.createdatetime desc",params);
+//
+//			JsonUtil.writeJson(returnList, pw); 
 			
 			Map<String, Object> params = new HashMap();
 			params.put("userId", currentUser.getId());
-			List returnList = service.findByHql("select new Map(m.homeTeam.name as homeTeamName,m.hostTeam.name as hostTeamName,"
-					+ " m.place as place,m.matchTime as matchTime,m.homeTeam.logoPic as homeTeamLogo,m.hostTeam.logoPic as hostTeamLogo)"
-					+ " from TeamMatch m join m.homeTeam.teamMates teamMate"
-					+ " where teamMate.user.id=:userId order by m.createdatetime desc",params);
+			List returnList = service.findByHql("select new Map(v.id as matchId,v.homeTeam.name as homeTeamName,v.hostTeam.name as hostTeamName,"
+					+ " v.place as place,v.matchTime as matchTime,v.homeTeam.logoPic as homeTeamLogo,v.hostTeam.logoPic as hostTeamLogo,"
+					+ "v.joinType as joinType,v.playerId as playerId)"
+					+ " from ViewMatchPlayerMate v where v.mateUserId=:userId order by v.createdatetime desc",params);
 
 			JsonUtil.writeJson(returnList, pw); 
+			
+			
+			
 		}else if("my".equals(getType)){
 			
 			Map<String, Object> params = new HashMap();
@@ -321,6 +338,98 @@ public class AppBaseController extends BaseController<User> {
 	}
 	
 	
+	
+	@RequestMapping("/joinMatch")
+	public void joinMatch( HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+
+		String matchId = request.getParameter("matchId");
+		String joinType = request.getParameter("joinType");
+		String playerId = request.getParameter("playerId");
+		
+		
+		User currentUser = sessionInfo.getUser();
+
+		Json json = new Json();
+		
+		
+		
+		try {
+			
+			MatchPlayer matchPlayer = getMatchPlayerById(playerId);
+			
+			if(matchPlayer==null){
+				matchPlayer = new MatchPlayer();
+			}
+			
+			TeamMatch match = getMatchById(matchId);
+			
+			TeamMate teamMate = getTeamMate(match.getHomeTeam().getId(),currentUser.getId());
+			
+			
+			matchPlayer.setTeamMate(teamMate);
+			matchPlayer.setTeamMatch(match);
+			matchPlayer.setJoinType(joinType);
+
+			service.saveObj(matchPlayer);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setMsg(e.toString());
+			json.setSuccess(false);
+		}
+		json.setMsg("加入比赛成功!");
+		json.setSuccess(true);
+			
+
+		JsonUtil.writeJson(json, pw);
+	}
+	
+	
+	
+	
+	private MatchPlayer getMatchPlayerById(String playerId) {
+		Map<String, Object> params = new HashMap();
+		params.put("id", playerId);
+
+		List<MatchPlayer> returnList = service
+				.findByHql("from MatchPlayer t where t.id=:id",params);
+		if(returnList.size()>0){
+			return returnList.get(0);
+		}
+		return null;
+	}
+
+	private TeamMate getTeamMate(String teamId, String userId) {
+		Map<String, Object> params = new HashMap();
+		params.put("teamId", teamId);
+		params.put("userId", userId);
+
+		List<TeamMate> returnList = service
+				.findByHql("from TeamMate t where t.team.id=:teamId and t.user.id=:userId",params);
+		if(returnList.size()>0){
+			return returnList.get(0);
+		}
+		return null;
+	}
+
+	private TeamMatch getMatchById(String matchId) {
+		Map<String, Object> params = new HashMap();
+		params.put("id", matchId);
+
+		List<TeamMatch> returnList = service
+				.findByHql("from TeamMatch t where t.id=:id",params);
+		if(returnList.size()>0){
+			return returnList.get(0);
+		}
+		return null;
+	}
+
 	@RequestMapping("/createTeam")
 	public void createTeam(Team data, HttpServletRequest request,
 			HttpServletResponse response, HttpSession session, PrintWriter pw) {
@@ -450,6 +559,26 @@ public class AppBaseController extends BaseController<User> {
 			}
 		}
 		return null;
+	}
+	
+	private Team setCurrentTeamByUserId(String userId) {
+		
+		Team team = getCurrentTeamByUserId(userId);
+		if(team==null){
+			
+			Map<String, Object> params = new HashMap();
+			params.put("userId", userId);
+			
+			List<TeamMate> returnList = service
+					.findByHql("from TeamMate m where m.user.id=:userId",params);
+			if(returnList.size()>0){
+				TeamMate teamMate = returnList.get(0);
+				teamMate.setIsCurrentTeam(true);
+				service.saveObj(teamMate);
+				return teamMate.getTeam();
+			}
+		}
+		return team;
 	}
 	
 	
