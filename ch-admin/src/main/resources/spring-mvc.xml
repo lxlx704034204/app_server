@@ -97,6 +97,7 @@
 			<mvc:exclude-mapping path="/error/*" />
 			<mvc:exclude-mapping path="/rest/*" />
 			<mvc:exclude-mapping path="/init" />
+			<mvc:exclude-mapping path="/app/web/**" />
 			<mvc:exclude-mapping path="/**/*_doNotNeedSession" />
 			<mvc:exclude-mapping path="/**/*_doNotNeedSessionAndSecurity" />
 			<bean class="com.ch.base.interceptor.SessionInterceptor" />
@@ -114,6 +115,7 @@
 			<mvc:exclude-mapping path="/rest/*" />
 			<mvc:exclude-mapping path="/error/*" />
 			<mvc:exclude-mapping path="/init" />
+			<mvc:exclude-mapping path="/app/web/**" />
 			<mvc:exclude-mapping path="/**/*_doNotNeedSecurity" />
 			<mvc:exclude-mapping path="/**/*_doNotNeedSessionAndSecurity" />
 			<bean class="com.ch.base.interceptor.SecurityInterceptor" />

@@ -133,7 +133,7 @@ public class AppBaseController extends BaseController<User> {
 						if(currentTeam!=null){
 							appUser.setCurrentTeam(currentTeam);
 						}else{
-							currentTeam = setCurrentTeamByUserId(user.getId());
+							currentTeam = setCurrentTeamForUserId(user.getId());
 						}
 						
 						
@@ -149,6 +149,7 @@ public class AppBaseController extends BaseController<User> {
 						sessionInfo.setUser(user);
 						session.setAttribute(ConfigUtil.getSessionInfoName(),
 								sessionInfo);
+						
 
 					} else {
 						json.setMsg("当前帐号没有登录权限！");
@@ -184,7 +185,7 @@ public class AppBaseController extends BaseController<User> {
 		
 		if("my".equals(getType)){
 			
-			setCurrentTeamByUserId(currentUser.getId());
+			setCurrentTeamForUserId(currentUser.getId());
 			
 			Map<String, Object> params = new HashMap();
 			params.put("userId", currentUser.getId());
@@ -561,7 +562,7 @@ public class AppBaseController extends BaseController<User> {
 		return null;
 	}
 	
-	private Team setCurrentTeamByUserId(String userId) {
+	private Team setCurrentTeamForUserId(String userId) {
 		
 		Team team = getCurrentTeamByUserId(userId);
 		if(team==null){

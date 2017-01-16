@@ -1,41 +1,60 @@
 package com.ch.app.controller;
 
-import java.io.BufferedInputStream;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.ch.app.model.app.AppUser;
+import com.ch.app.model.FootballSkill;
+import com.ch.app.model.TeamMate;
 import com.ch.base.controller.BaseController;
-import com.ch.base.model.SessionInfo;
-import com.ch.base.model.easyui.Json;
 import com.ch.base.service.BaseServiceI;
-import com.ch.base.util.ConfigUtil;
 import com.ch.base.util.JsonUtil;
 import com.ch.sys.model.User;
+import com.ch.sys.service.UserServiceI;
 
 @Controller
 @RequestMapping(value="/app/web")
 public class AppWebController extends BaseController<User> {
 
-	@Autowired
-	private BaseServiceI<User> baseService;
+	@Resource
+	public void setService(UserServiceI service) {
+		this.service = service;
+	}
+
+	@Resource
+	private JdbcTemplate jdbcTemplate;
 	
-	private static String FP_Football_Rss = "http://news.qq.com/newsgn/rss_newsgn.xml";
+	private SimpleDateFormat sdf = new SimpleDateFormat();
+	
+	private static String FP_Football_Rss = "http://voice.hupu.com/generated/voice/news_soccer.xml";
+	private static String Football_SKILL_WEB = "http://www.jqzfxxgk.cn/authord/zuqiujiaoxue";
+	
+	
+	@RequestMapping(value="/getFootballSkill")
+	public void getFootballSkill(Model model,HttpServletResponse response,HttpServletRequest request,HttpSession session,PrintWriter pw){
+		
+		List<FootballSkill> returnList = service
+				.findByHql("from FootballSkill m");
+		
+		JsonUtil.writeJson(returnList, pw); 
+		
+	}
 	
 	/**
 	 * 访问外部RSS资源，解决JS跨域问题。
@@ -45,7 +64,7 @@ public class AppWebController extends BaseController<User> {
 	 * @param session
 	 * @param pw
 	 */
-	@RequestMapping(value="getFpRss")
+	@RequestMapping(value="/getFpRss")
 	public void getFpRss(Model model,HttpServletResponse response,HttpServletRequest request,HttpSession session,PrintWriter pw){
 		
 		String xml = getRss(FP_Football_Rss);
