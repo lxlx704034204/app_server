@@ -2,6 +2,7 @@ package com.ch.app.controller;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,30 @@ public class AppTeamController extends BaseController<User> {
 		params.put("teamId", teamId);
 		
 		List<FootballSkill> returnList = service
-				.findByHql("from TeamMate m where m.team.id=:teamId",params);
+				.findByHql("from TeamMate m where m.team.id=:teamId order by m.isTeamLeader desc,m.isTeamManager desc,m.id asc",params);
 		
 		JsonUtil.writeJson(returnList, pw); 
 		
 	}
 	
-	
+	@RequestMapping(value="/getTeam")
+	private void getTeam(Model model,HttpServletResponse response,HttpServletRequest request,HttpSession session,PrintWriter pw){
+		
+		String teamId = request.getParameter("teamId");
+		Map<String, Object> params = new HashMap();
+		params.put("id", teamId);
+
+		List<Map> returnList = service
+				.findByHql("from Team m where m.id=:id",params);
+		
+//		Map qq = new HashMap();
+//		qq.put("name", "111");
+//		List returnList = new ArrayList();
+//		returnList.add(qq);
+//		returnList.add(qq);
+		
+		if(returnList.size()>0){
+			JsonUtil.writeJson(returnList, pw);
+		}
+	}
 }
