@@ -42,6 +42,7 @@ public class TeamMate implements Serializable {
 	private Integer height;
 	private Integer weight;
 	private String position;
+	private String faceLogo;
 	
 
 	@Id
@@ -200,6 +201,14 @@ public class TeamMate implements Serializable {
 
 	public void setIsCurrentTeam(Boolean isCurrentTeam) {
 		this.isCurrentTeam = isCurrentTeam;
+	}
+	@Column(name = "FACE_LOGO",  length = 200)
+	public String getFaceLogo() {
+		return faceLogo;
+	}
+
+	public void setFaceLogo(String faceLogo) {
+		this.faceLogo = faceLogo;
 	}
 	
 }

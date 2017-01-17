@@ -92,6 +92,52 @@ public class AppBaseController extends BaseController<User> {
 		JsonUtil.writeJson(json, pw);
 
 	}
+	
+	
+	@RequestMapping(value = "/setCurrentTeam", method = RequestMethod.POST)
+	synchronized public void setCurrentTeam(HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		Json json = new Json();
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+
+		User currentUser = sessionInfo.getUser();
+		
+		
+		
+		Map<String, Object> params = new HashMap();
+		params.put("userId", currentUser.getId());
+		List<TeamMate> returnList = service
+				.findByHql("from TeamMate m where m.user.id=:userId",params);
+		for(TeamMate teamMate:returnList){
+			teamMate.setIsCurrentTeam(false);
+			service.saveObj(teamMate);
+		}
+		
+		
+		
+		String teamId = request.getParameter("teamId");
+		params.put("teamId", teamId);
+		
+		returnList = service
+				.findByHql("from TeamMate m where m.user.id=:userId and m.team.id=:teamId",params);
+		if(returnList.size()>0){
+			TeamMate teamMate = returnList.get(0);
+			teamMate.setIsCurrentTeam(true);
+			service.saveObj(teamMate);
+			json.setMsg("设置成功！");
+			json.setSuccess(true);
+			JsonUtil.writeJson(json, pw);
+		}else{
+			
+			json.setMsg("设置失败！");
+			json.setSuccess(false);
+			JsonUtil.writeJson(json, pw);
+		}
+
+		
+
+	}
 
 	@RequestMapping(value = "/login_doNotNeedSessionAndSecurity", method = RequestMethod.POST)
 	synchronized public void login(User data, HttpServletRequest request,
@@ -133,7 +179,7 @@ public class AppBaseController extends BaseController<User> {
 						if(currentTeam!=null){
 							appUser.setCurrentTeam(currentTeam);
 						}else{
-							currentTeam = setCurrentTeamForUserId(user.getId());
+							currentTeam = setCurrentTeamAutoForUserId(user.getId());
 						}
 						
 						
@@ -185,7 +231,7 @@ public class AppBaseController extends BaseController<User> {
 		
 		if("my".equals(getType)){
 			
-			setCurrentTeamForUserId(currentUser.getId());
+			setCurrentTeamAutoForUserId(currentUser.getId());
 			
 			Map<String, Object> params = new HashMap();
 			params.put("userId", currentUser.getId());
@@ -215,6 +261,7 @@ public class AppBaseController extends BaseController<User> {
 		User currentUser = sessionInfo.getUser();
 		
 		String getType = request.getParameter("getType");
+		String currentTeamId = request.getParameter("currentTeamId");
 		
 		
 		if("myTeam".equals(getType)){
@@ -239,13 +286,16 @@ public class AppBaseController extends BaseController<User> {
 			
 			
 			
-		}else if("my".equals(getType)){
+		}else if("currentTeam".equals(getType)){
 			
 			Map<String, Object> params = new HashMap();
 			params.put("userId", currentUser.getId());
-			List returnList = service.findByHql("select new Map(m.homeTeam.name as homeTeamName,m.hostTeam.name as hostTeamName,"
-					+ " m.place as place,m.matchTime as matchTime,m.homeTeam.logoPic as homeTeamLogo,m.hostTeam.logoPic as hostTeamLogo)"
-					+ " from TeamMatch m join m.matchPlayers player where player.teamMate.user.id=:userId order by m.createdatetime desc",params);
+			params.put("currentTeamId", currentTeamId);
+			
+			List returnList = service.findByHql("select new Map(v.id as matchId,v.homeTeam.name as homeTeamName,v.hostTeam.name as hostTeamName,"
+					+ " v.place as place,v.matchTime as matchTime,v.homeTeam.logoPic as homeTeamLogo,v.hostTeam.logoPic as hostTeamLogo,"
+					+ "v.joinType as joinType,v.playerId as playerId)"
+					+ " from ViewMatchPlayerMate v where v.homeTeam.id=:currentTeamId and v.mateUserId=:userId order by v.createdatetime desc",params);
 
 			JsonUtil.writeJson(returnList, pw); 
 		}else if("other".equals(getType)){
@@ -562,7 +612,7 @@ public class AppBaseController extends BaseController<User> {
 		return null;
 	}
 	
-	private Team setCurrentTeamForUserId(String userId) {
+	private Team setCurrentTeamAutoForUserId(String userId) {
 		
 		Team team = getCurrentTeamByUserId(userId);
 		if(team==null){
