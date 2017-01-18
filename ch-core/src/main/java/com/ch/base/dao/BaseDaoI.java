@@ -36,6 +36,15 @@ public interface BaseDaoI<T> {
 	 * @return 对象的ID
 	 */
 	public Serializable saveObj(Object o);
+	
+	
+	/**
+	 * 更新一个对象
+	 * 
+	 * @param o
+	 *            对象
+	 */
+	public void updateObj(Object o);
 
 	/**
 	 * 删除一个对象

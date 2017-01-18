@@ -369,6 +369,7 @@ public class AppBaseController extends BaseController<User> {
 			TeamMate teamMate = new TeamMate();
 			teamMate.setTeam(team);
 			teamMate.setName(name);
+			teamMate.setFaceLogo("19.png");
 			teamMate.setAge(Integer.valueOf(age));
 			teamMate.setWeight(Integer.valueOf(weight));
 			teamMate.setHeight(Integer.valueOf(height));
@@ -492,7 +493,7 @@ public class AppBaseController extends BaseController<User> {
 			
 		try {
 			
-			data.setIsJoin(true);
+			data.setAllowJoin(true);
 			data.setDescription("新球队成立于"+(new Date()).toLocaleString());
 			service.saveObj(data);
 			
@@ -502,6 +503,7 @@ public class AppBaseController extends BaseController<User> {
 			teamMate.setTeam(data);
 			teamMate.setName(currentUser.getName());
 			teamMate.setUser(currentUser);
+			teamMate.setFaceLogo("04.png");
 			teamMate.setIsTeamLeader(true);
 			teamMate.setIsTeamManager(true);
 			service.saveObj(teamMate);

@@ -245,6 +245,14 @@ public class BaseDaoImpl<T> implements BaseDaoI<T> {
 		}
 		return null;
 	}
+
+	@Override
+	public void updateObj(Object o) {
+		// TODO Auto-generated method stub
+		if (o != null) {
+			getCurrentSession().update(o);
+		}
+	}
 	
 	
 

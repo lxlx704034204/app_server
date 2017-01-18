@@ -3,6 +3,7 @@ package com.ch.app.controller;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.ch.app.model.FootballSkill;
+import com.ch.app.model.Team;
+import com.ch.app.model.TeamMate;
 import com.ch.base.controller.BaseController;
+import com.ch.base.model.SessionInfo;
+import com.ch.base.model.easyui.Json;
+import com.ch.base.util.ConfigUtil;
 import com.ch.base.util.JsonUtil;
 import com.ch.sys.model.User;
 import com.ch.sys.service.UserServiceI;
@@ -72,4 +78,36 @@ public class AppTeamController extends BaseController<User> {
 			JsonUtil.writeJson(returnList, pw);
 		}
 	}
+	
+	@RequestMapping("/updateTeam")
+	public void updateTeam(Team data, HttpServletRequest request,
+			HttpServletResponse response, HttpSession session, PrintWriter pw) {
+		
+		SessionInfo sessionInfo = (SessionInfo) request.getSession()
+				.getAttribute(ConfigUtil.getSessionInfoName());
+		
+		Json json = new Json();
+			
+		try {
+			
+			
+			
+			service.updateObj(data);
+			
+			
+			
+			json.setMsg("保存成功!");
+			json.setSuccess(true);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.setMsg(e.toString());
+			json.setSuccess(false);
+		}
+			
+		
+
+		JsonUtil.writeJson(json, pw);
+	}
+	
 }

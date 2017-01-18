@@ -219,5 +219,10 @@ public class BaseServiceImpl<T> implements BaseServiceI<T> {
 	public Serializable saveObj(Object o) {
 		return baseDao.saveObj(o);
 	}
+	
+	@Override
+	public void updateObj(Object o) {
+		baseDao.updateObj(o);
+	}
 
 }

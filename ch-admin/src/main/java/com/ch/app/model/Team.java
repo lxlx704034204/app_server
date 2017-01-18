@@ -40,6 +40,10 @@ public class Team implements Serializable {
 	private String logoPic;
 	private String description;
 	private String city;
+	private String province;
+	private Boolean allowJoin;
+	private Boolean allowMatch;
+	
 	private Boolean isJoin;
 	
 	private Set<TeamMate> teamMates = new HashSet<TeamMate>(0);
@@ -116,6 +120,14 @@ public class Team implements Serializable {
 	public void setCity(String city) {
 		this.city = city;
 	}
+	@Column(name = "PROVINCE", nullable = false, length = 100)
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
 	public Set<TeamMate> getTeamMates() {
@@ -126,8 +138,27 @@ public class Team implements Serializable {
 		this.teamMates = teamMates;
 	}
 
-	@Column(name = "IS_JOIN")
+	@Column(name = "ALLOW_JOIN")
 	@org.hibernate.annotations.Type(type="yes_no")
+	public Boolean getAllowJoin() {
+		return allowJoin;
+	}
+
+	public void setAllowJoin(Boolean allowJoin) {
+		this.allowJoin = allowJoin;
+	}
+
+	@Column(name = "ALLOW_MATCH")
+	@org.hibernate.annotations.Type(type="yes_no")
+	public Boolean getAllowMatch() {
+		return allowMatch;
+	}
+
+	public void setAllowMatch(Boolean allowMatch) {
+		this.allowMatch = allowMatch;
+	}
+	
+	@Transient
 	public Boolean getIsJoin() {
 		return isJoin;
 	}
@@ -135,6 +166,9 @@ public class Team implements Serializable {
 	public void setIsJoin(Boolean isJoin) {
 		this.isJoin = isJoin;
 	}
+
+	
+	
 	
 	
 }
