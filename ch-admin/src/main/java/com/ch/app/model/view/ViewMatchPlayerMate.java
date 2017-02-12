@@ -46,9 +46,9 @@ public class ViewMatchPlayerMate implements Serializable {
 	private String mateUserId;
 	
 	private String playerId;
-	private String assist;
-	private String goal;
-	private String mvp;
+	private Integer assist;
+	private Integer goal;
+	private Integer mvp;
 	private String alreadyJoinMateId;
 	private String joinType;
 	
@@ -220,28 +220,28 @@ public class ViewMatchPlayerMate implements Serializable {
 	public void setPlayerId(String playerId) {
 		this.playerId = playerId;
 	}
-	@Column(name = "ASSIST", length = 50)
-	public String getAssist() {
+	@Column(name = "ASSIST",  precision = 4, scale = 0)
+	public Integer getAssist() {
 		return assist;
 	}
-	public void setAssist(String assist) {
+	public void setAssist(Integer assist) {
 		this.assist = assist;
 	}
-	@Column(name = "GOAL", length = 50)
-	public String getGoal() {
+	@Column(name = "GOAL", precision = 4, scale = 0)
+	public Integer getGoal() {
 		return goal;
 	}
-	public void setGoal(String goal) {
+	public void setGoal(Integer goal) {
 		this.goal = goal;
 	}
-	@Column(name = "MVP", length = 50)
-	public String getMvp() {
+	@Column(name = "MVP", precision = 4, scale = 0)
+	public Integer getMvp() {
 		return mvp;
 	}
-	public void setMvp(String mvp) {
+	public void setMvp(Integer mvp) {
 		this.mvp = mvp;
 	}
-	@Column(name = "ALREADY_JOIN_MATE", length = 50)
+	@Column(name = "ALREADY_JOIN_MATE_ID", length = 50)
 	public String getAlreadyJoinMateId() {
 		return alreadyJoinMateId;
 	}
